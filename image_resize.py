@@ -1,8 +1,71 @@
+import argparse
+import os
+from PIL import Image
 
 
-def resize_image(path_to_original, path_to_result):
-    pass
+def get_parse_parameters():
+    parser = argparse.ArgumentParser(description='Resize image')
+    parser.add_argument('filepath', metavar='FilePath')
+    parser.add_argument('--output')
+    parser.add_argument('--width')
+    parser.add_argument('--height')
+    parser.add_argument('--scale')
+    parse_parameters = vars(parser.parse_args())
+    return parse_parameters
+
+
+def validation_parse_parameters(parse_parameters):
+    if parse_parameters['scale'] and (parse_parameters['width']
+            or parse_parameters['height']):
+        print('Scale and side or sides at once moment')
+        return 'Error'
+    if (not parse_parameters['scale'] and not parse_parameters['width']
+            and not parse_parameters['height']):
+        print('Dont have information for take new size')
+        return 'Error'
+    if not os.path.exists(parse_parameters['filepath']):
+        print('Wrong filepath or filename')
+        return 'Error'
+
+
+def resize_image(parse_parameters):
+    filepath = parse_parameters['filepath']
+    filename = os.path.basename(filepath)
+    filename_w_o_ext = os.path.splitext(filename)[0]
+    extension = os.path.splitext(filename)[1]
+    img = Image.open(filepath)
+    width, height = img.size
+    output_filepath = parse_parameters['output']
+    if parse_parameters['scale']:
+        scale = float(parse_parameters['scale'])
+        new_width = width*scale
+        new_height = height*scale
+    else:
+        new_width = parse_parameters['width']
+        new_height = parse_parameters['height']
+        try:
+            new_width = float(new_width)
+        except TypeError:
+            new_width = width*float(new_height)/height
+        try:
+            new_height = float(new_height)
+        except TypeError:
+            new_height = float(new_width)*height/width
+        if new_width/width != new_height/height:
+            print('Proportion is not the same as the source file')
+    new_width = int(new_width)
+    new_height = int(new_height)
+    new_image = img.resize((new_width, new_height), Image.LANCZOS)
+    new_filename = '{}{}{}{}{}{}'.format(filename_w_o_ext,
+        '___', new_width, 'x', new_height, extension)
+    if output_filepath:
+        new_filepath = os.path.join(output_filepath, new_filepath)
+        new_image.save(new_filepath)
+    else:
+        new_image.save(new_filename)
 
 
 if __name__ == '__main__':
-    pass
+    _get_parse_parameters = get_parse_parameters()
+    if validation_parse_parameters(_get_parse_parameters) is None:
+        resize_image(_get_parse_parameters)
