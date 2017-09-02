@@ -33,21 +33,21 @@ def get_new_size(parse_parameters):
     width, height = img.size
     if parse_parameters['scale']:
         scale = float(parse_parameters['scale'])
-        new_width = width*scale
-        new_height = height*scale
-    else:
-        new_width = parse_parameters['width']
-        new_height = parse_parameters['height']
-        try:
-            new_width = float(new_width)
-        except TypeError:
-            new_width = width*float(new_height)/height
-        try:
-            new_height = float(new_height)
-        except TypeError:
-            new_height = float(new_width)*height/width
-        if new_width/width != new_height/height:
-            print('Proportion is not the same as the source file')
+        new_width_sc = width*scale
+        new_height_sc = height*scale
+        return int(new_width_sc), int(new_height_sc)
+    new_width = parse_parameters['width']
+    new_height = parse_parameters['height']
+    try:
+        new_width = float(new_width)
+    except TypeError:
+        new_width = width*float(new_height)/height
+    try:
+        new_height = float(new_height)
+    except TypeError:
+        new_height = float(new_width)*height/width
+    if new_width/width != new_height/height:
+        print('Proportion is not the same as the source file')
     return int(new_width), int(new_height)
 
 
