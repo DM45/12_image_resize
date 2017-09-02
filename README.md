@@ -12,15 +12,13 @@ pip install -r requirements.txt # alternatively try pip3
 
 # How it work
 ```bash
-python image_resize.py -h 
+python image_resize.py -h # for help
 ```
-for info
-
 1 required parameter - filepath
 
 to resize need width or height or width with height or scale
 
-cant processing size parameter and scale once time
+cant processing size parameter (width, height) and scale once time
 
 # Project Goals
 
