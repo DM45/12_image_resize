@@ -46,13 +46,12 @@ def get_new_size(parse_parameters):
         new_height = float(new_height)
     except TypeError:
         new_height = float(new_width)*height/width
-    if new_width/width != new_height/height:
-        print('Proportion is not the same as the source file')
     return int(new_width), int(new_height)
 
 
 def resize_image(parse_parameters, new_width, new_height):
     img = Image.open(parse_parameters['filepath'])
+    width, height = img.size
     filepath = parse_parameters['filepath']
     filename = os.path.basename(filepath)
     filename_w_o_ext = os.path.splitext(filename)[0]
@@ -61,6 +60,8 @@ def resize_image(parse_parameters, new_width, new_height):
     new_image = img.resize((new_width, new_height), Image.LANCZOS)
     new_filename = '{}{}{}{}{}{}'.format(filename_w_o_ext,
         '___', new_width, 'x', new_height, extension)
+    if new_width/width != new_height/height:
+        print('Proportion is not the same as the source file')
     if output_filepath:
         new_filepath = os.path.join(output_filepath, new_filepath)
         new_image.save(new_filepath)
