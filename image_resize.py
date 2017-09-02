@@ -28,14 +28,9 @@ def validation_parse_parameters(parse_parameters):
         return 'Error'
 
 
-def resize_image(parse_parameters):
-    filepath = parse_parameters['filepath']
-    filename = os.path.basename(filepath)
-    filename_w_o_ext = os.path.splitext(filename)[0]
-    extension = os.path.splitext(filename)[1]
-    img = Image.open(filepath)
+def get_new_size(parse_parameters):
+    img = Image.open(parse_parameters['filepath'])
     width, height = img.size
-    output_filepath = parse_parameters['output']
     if parse_parameters['scale']:
         scale = float(parse_parameters['scale'])
         new_width = width*scale
@@ -53,8 +48,16 @@ def resize_image(parse_parameters):
             new_height = float(new_width)*height/width
         if new_width/width != new_height/height:
             print('Proportion is not the same as the source file')
-    new_width = int(new_width)
-    new_height = int(new_height)
+    return int(new_width), int(new_height)
+
+
+def resize_image(parse_parameters, new_width, new_height):
+    img = Image.open(parse_parameters['filepath'])
+    filepath = parse_parameters['filepath']
+    filename = os.path.basename(filepath)
+    filename_w_o_ext = os.path.splitext(filename)[0]
+    extension = os.path.splitext(filename)[1]
+    output_filepath = parse_parameters['output']
     new_image = img.resize((new_width, new_height), Image.LANCZOS)
     new_filename = '{}{}{}{}{}{}'.format(filename_w_o_ext,
         '___', new_width, 'x', new_height, extension)
@@ -68,4 +71,5 @@ def resize_image(parse_parameters):
 if __name__ == '__main__':
     _get_parse_parameters = get_parse_parameters()
     if validation_parse_parameters(_get_parse_parameters) is None:
-        resize_image(_get_parse_parameters)
+        _get_new_size = get_new_size(_get_parse_parameters)
+        resize_image(_get_parse_parameters, _get_new_size[0], _get_new_size[1])
