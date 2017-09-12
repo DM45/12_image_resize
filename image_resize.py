@@ -34,8 +34,8 @@ def get_new_size(parse_parameters):
         scale = float(parse_parameters.scale)
         new_width_sc = width*scale
         new_height_sc = height*scale
-        return (int(new_width_sc), int(new_height_sc),
-                img, width, height)
+        return int(new_width_sc), int(
+                new_height_sc), img, width, height
     new_width = parse_parameters.width
     new_height = parse_parameters.height
     try:
