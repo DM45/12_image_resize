@@ -18,7 +18,7 @@ def get_parse_parameters():
 
 
 def get_errors_check_with_output(
-        par_filepath, par_width, par_height, par_scale):
+            par_filepath, par_width, par_height, par_scale):
     if par_scale and (par_width or par_height):
         return 'Scale and side or sides at once moment'
     if (not par_scale and not par_width and not par_height):
@@ -60,8 +60,10 @@ def get_proportion_check(new_width, new_height, old_width, old_height):
         return 'Proportion is not the same as the source file'
 
 
-def save_new_image(par_filepath, new_width,
-        new_height, old_image, new_image, par_output):
+def save_new_image(
+            par_filepath, new_width,
+            new_height, old_image, 
+            new_image, par_output):
     width, height = old_image.size
     filename = os.path.basename(par_filepath)
     filename_w_o_ext = os.path.splitext(filename)[0]
