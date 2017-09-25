@@ -41,8 +41,8 @@ def get_new_size(param_filepath, param_width, param_height, param_scale):
             'new_width': int(new_width), 
             'new_height': int(new_height),
             'old_image': img, 
-            'old_width': int(width),
-            'old_height': int(height)
+            'old_width': width,
+            'old_height': height
         }
     new_width = param_width
     new_height = param_height
