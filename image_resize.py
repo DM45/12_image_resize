@@ -14,38 +14,42 @@ def get_parse_parameters():
     return {
         'filepath': parse_params.filepath,
         'output': parse_params.output,
-        'width': parse_params.width,
-        'height': parse_params.height, 
+        'new_width': parse_params.width,
+        'new_height': parse_params.height, 
         'scale': parse_params.scale
     }
 
 
-def get_validation_data(
-            param_filepath, param_width, param_height, param_scale):
-    if param_scale and (param_width or param_height):
+def get_validation_result(
+            filepath, width, height, scale):
+    if scale and (width or height):
         return 'Scale and side or sides at once moment'
-    if (not param_scale and not param_width and not param_height):
+    if (not scale and not width and not height):
         return 'Dont have information for take new size'
-    if not os.path.exists(param_filepath):
+    if not os.path.exists(filepath):
         return 'Wrong filepath or filename'
 
 
-def get_new_size(param_filepath, param_width, param_height, param_scale):
-    img = Image.open(param_filepath)
+def get_image_with_size(filepath):
+    img = Image.open(filepath)
     width, height = img.size
-    if param_scale:
-        scale = float(param_scale)
+    return {
+        'image': img,
+        'width': width,
+        'height': height
+    }
+
+
+
+def get_new_size(width, height, new_width, new_height, scale):
+    if scale:
+        scale = float(scale)
         new_width = width*scale
         new_height = height*scale
         return {
             'new_width': int(new_width), 
             'new_height': int(new_height),
-            'old_image': img, 
-            'old_width': width,
-            'old_height': height
         }
-    new_width = param_width
-    new_height = param_height
     try:
         new_width = float(new_width)
     except TypeError:
@@ -57,67 +61,66 @@ def get_new_size(param_filepath, param_width, param_height, param_scale):
     return {
         'new_width': int(new_width), 
         'new_height': int(new_height),
-        'old_image': img, 
-        'old_width': width,
-        'old_height': height
     }
 
 
-def get_resize_image(new_width, new_height, old_image):
-    new_image = old_image.resize((new_width, new_height),
+def get_resized_image(width, height, old_image):
+    resized_image = old_image.resize((width, height),
             Image.LANCZOS)
-    return new_image
+    return resized_image
 
 
 def get_size_proportion_check(new_width, new_height, old_width, old_height):
     if new_width/int(old_width) != new_height/int(old_height):
-        return 'Sizes proportion of new image is not the same as the source file'
+        return 'Sizes proportion of new image is not same as the source file'
 
 
-def save_new_image_as_file(
-            param_filepath, new_width,
-            new_height, new_image, 
-            param_output):
-    filename = os.path.basename(param_filepath)
+def save_image(
+            filepath, width,
+            height, image, 
+            output):
+    filename = os.path.basename(filepath)
     filename_w_o_ext, extension = os.path.splitext(filename)
     new_filename = '{}___{}x{}{}'.format(filename_w_o_ext,
-        new_width, new_height, extension)
-    if param_output:
-        new_filepath = os.path.join(param_output, new_filepath)
-        new_image.save(new_filepath)
+        width, height, extension)
+    if output:
+        new_filepath = os.path.join(output, new_filename)
+        image.save(new_filepath)
     else:
-        new_image.save(new_filename)
+        image.save(new_filename)
 
 
 if __name__ == '__main__':
     parse_parameters = get_parse_parameters()
-    validation_data = get_validation_data(
+    validation_result = get_validation_result(
             parse_parameters['filepath'],
-            parse_parameters['width'],
-            parse_parameters['height'],
+            parse_parameters['new_width'],
+            parse_parameters['new_height'],
             parse_parameters['scale'])
-    if validation_data is None:
+    if validation_result is None:
+        image_with_size = get_image_with_size(parse_parameters['filepath'])
         new_size = get_new_size(
-                parse_parameters['filepath'],
-                parse_parameters['width'],
-                parse_parameters['height'],
+                image_with_size['width'],
+                image_with_size['height'],
+                parse_parameters['new_width'],
+                parse_parameters['new_height'],
                 parse_parameters['scale'])
-        resize_image = get_resize_image(
+        resized_image = get_resized_image(
                 new_size['new_width'],
                 new_size['new_height'],
-                new_size['old_image'])
+                image_with_size['image'])
         proportion_check = get_size_proportion_check(
                 new_size['new_width'],
                 new_size['new_height'],
-                new_size['old_width'],
-                new_size['old_height'])
+                image_with_size['width'],
+                image_with_size['height'])
         if proportion_check:
             print(proportion_check)
-        save_new_image_as_file(
+        save_image(
                 parse_parameters['filepath'],
                 new_size['new_width'],
                 new_size['new_height'],
-                resize_image,
+                resized_image,
                 parse_parameters['output'])
     else:
         print(validation_data)
